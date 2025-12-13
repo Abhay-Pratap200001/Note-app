@@ -1,6 +1,7 @@
 import express from "express"
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser"
+import path from 'path';
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { connectDB } from "./config/db.connection.js";
@@ -10,15 +11,30 @@ import noteRouter from './Routes/note.Routes.js'
 
 dotenv.config();
 
+const __dirname = path.resolve();
 const PORT = process.env.PORT || 5000;
 const app = express();
+
+
 
 app.use(cookieParser()) //for accepting the cookies from client
 app.use(express.json()) //for input data
 
+
+
 // user and not routes
 app.use("/api/auth", authRouter)
 app.use("/api/note", noteRouter)
+
+
+
+app.use(express.static(path.join(__dirname, 'client/dist')))
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'))
+})
+
+
 
 app.use(errorHandler);
 
