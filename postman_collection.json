@@ -1,0 +1,74 @@
+{
+	"info": {
+		"_postman_id": "7dccec03-f1a7-4277-8cea-e53836479067",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "44787506",
+		"_collection_link": "https://cloudy-rocket-4229600.postman.co/workspace/bookstroe~94dbf4e3-6021-4fb1-b34f-c1a8f28b402c/collection/44787506-7dccec03-f1a7-4277-8cea-e53836479067?action=share&source=collection_link&creator=44787506"
+	},
+	"item": [
+		{
+			"name": "NoteApp",
+			"item": [
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Signup",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Signin",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "SignOut",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Notes",
+					"item": [
+						{
+							"name": "createNotes",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "GetNotes",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "DeleteNote",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
