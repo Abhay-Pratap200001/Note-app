@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { ApiError } from './ApiError.js';
 
-export const verifyToken = (req, res, next) => {
+export const VerifyToken = (req, res, next) => {
   // Read JWT token from cookie sent by the client
   const token = req.cookies.access_token;
 
