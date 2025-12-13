@@ -4,7 +4,6 @@ import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import { Toaster } from "react-hot-toast";
-import EditNote from "./pages/EditNote";
 import { api } from "./api"; // Make sure to import api
 
 function App() {
@@ -53,8 +52,6 @@ function App() {
 
           {/* dashboard (Protected) */}
           <Route path="/dashboard" element={ currentUser ? ( <Dashboard setCurrentUser={setCurrentUser} />) : (<Navigate to="/signin" replace />)}/>
-
-          <Route path="/edit/:id" element={currentUser ? ( <EditNote />) : (<Navigate to="/signin" replace />)}/>
 
           {/* default Route */}
           <Route path="*" element={ <Navigate to={currentUser ? "/dashboard" : "/signin"} replace />}/>
