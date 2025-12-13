@@ -6,24 +6,23 @@ import toast from "react-hot-toast";
 const Dashboard = ({ setCurrentUser }) => {
   const navigate = useNavigate();
 
-  // for displaying the notes 
+   // for displaying the notes 
   const [notes, setNotes] = useState([]);
 
+  
   // for storing the notes data
   const [form, setForm] = useState({ title: "", description: "" });
 
-
+  // Edit note
   const [editId, setEditId] = useState(null);
-
-
-  // for storing the edit note data
   const [editData, setEditData] = useState({ title: "", description: "" });
 
-
+  // Search & Filter
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("latest");
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-
 
 
   const handleEditChange = (e) =>
@@ -46,7 +45,7 @@ const Dashboard = ({ setCurrentUser }) => {
   }, []);
 
 
-  // creating the note and sendind to server
+    // creating the note and sendind to server
   const createNote = async (e) => {
     e.preventDefault();
     await api.post("/note", form);
@@ -55,8 +54,7 @@ const Dashboard = ({ setCurrentUser }) => {
     fetchNotes();
   };
 
-
-// deleting the notes based on note id 
+  // deleting the notes based on note id 
   const deleteNote = async (id) => {
     await api.delete(`/note/${id}`);
     toast.success("Note deleted");
@@ -64,7 +62,7 @@ const Dashboard = ({ setCurrentUser }) => {
   };
 
 
-// keeping note based on id and editing it
+  // keeping note based on id and editing it
   const startEdit = (note) => {
     setEditId(note._id);
     setEditData({ title: note.title, description: note.description });
@@ -83,6 +81,17 @@ const Dashboard = ({ setCurrentUser }) => {
     }
   };
 
+  // Search & Filter logic
+  const filteredNotes = notes.filter((note) => note.title.toLowerCase().includes(search.toLowerCase()) || note.description.toLowerCase().includes(search.toLowerCase())).sort((a, b) => {
+      if (filter === "latest") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      if (filter === "oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+      return 0;
+    });
+
 
   // logout user function
   const logout = async () => {
@@ -92,14 +101,37 @@ const Dashboard = ({ setCurrentUser }) => {
     navigate("/sigin");
   };
 
-
-
   return (
     <div className="min-h-screen bg-slate-200 px-4 py-10">
+
+      {/* Search & Filter */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl shadow-sm border border-gray-300">
+          <div className="relative flex-1">
+
+            <input
+              type="text"
+              placeholder="Search notes by title or description..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md outline-none focus:ring-1 focus:ring-gray-500"/>
+            <span className="absolute right-3 top-2.5 text-gray-400">🔍</span>
+          </div>
+
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-1 focus:ring-gray-500 bg-white cursor-pointer">
+            <option value="latest">🕒 Latest First</option>
+            <option value="oldest">📅 Oldest First</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Main Card */}
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md border border-gray-300">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-semibold text-gray-800">Dashboard</h2>
-
           <button
             onClick={logout}
             className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-md transition">
@@ -117,103 +149,87 @@ const Dashboard = ({ setCurrentUser }) => {
             placeholder="Note Title"
             value={form.title}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-1 focus:ring-gray-500 outline-none"/>
+            className="w-full px-4 py-2 rounded-md border border-gray-300 outline-none"/>
 
           <textarea
             name="description"
             placeholder="Note Description"
             value={form.description}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-1 focus:ring-gray-500 outline-none"
-            rows={3}/>
+            rows={3}
+            className="w-full px-4 py-2 rounded-md border border-gray-300 outline-none"/>
 
-          <button
-            type="submit"
-            className="w-full py-2 bg-gray-800 hover:bg-black rounded-md text-white font-medium transition">
+          <button className="w-full py-2 bg-gray-800 hover:bg-black rounded-md text-white">
             Add Note
           </button>
         </form>
 
-
-        {/* Notes List */}
+        {/* Notes */}
         <h3 className="text-xl font-semibold mt-8 mb-3 text-gray-800">
           Your Notes
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {notes.map((note) => (
-            <div key={note._id}  className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
-              {/* edit note is equal to note id then show wdit note form */}
-              {editId === note._id ? (
 
+        {filteredNotes.length === 0 && (
+          <p className="text-center text-gray-500 mt-6">
+            No notes found.
+          </p>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredNotes.map((note) => (
+            <div key={note._id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+            
+            {/* edit note is equal to note id then show wdit note form */}
+              {editId === note._id ? (
                 <div>
-                  {/* Edit Mode */}
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Title
-                  </label>
                   <input
                     name="title"
                     value={editData.title}
                     onChange={handleEditChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:ring-1 focus:ring-gray-500"/>
+                    className="w-full px-3 py-2 border rounded-md mb-2"/>
 
-                  <label className="block text-sm text-gray-600 mt-3 mb-1">
-                    Description
-                  </label>
                   <textarea
                     name="description"
                     value={editData.description}
                     onChange={handleEditChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:ring-1 focus:ring-gray-500"
-                    rows={3}/>
+                    rows={3}
+                    className="w-full px-3 py-2 border rounded-md"/>
 
                   <div className="flex gap-3 mt-3">
                     <button
                       onClick={() => saveEdit(note._id)}
-                      className="px-3 py-1 bg-gray-800 hover:bg-black rounded-md text-white transition">
+                      className="px-3 py-1 bg-black text-white rounded-md">
                       Save
                     </button>
 
                     <button
                       onClick={() => setEditId(null)}
-                      className="px-3 py-1 bg-gray-300 hover:bg-gray-400 rounded-md transition">
+                      className="px-3 py-1 bg-gray-300 rounded-md">
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-
                 // else display all notes
                 <div>
-                  {/* View Mode */}
-                  <p className="text-sm text-gray-500">Title</p>
-                  <h4 className="text-lg font-medium text-gray-800">
-                    {note.title}
-                  </h4>
-
-                  <p className="text-sm text-gray-500 mt-3">Description</p>
-                  <p className="text-gray-700">{note.description}</p>
-
-                  <p className="text-xs text-gray-500 mt-3">
-                    Created:
-                    <span className="text-gray-800">
-                      {new Date(note.createdAt).toLocaleString()}
-                    </span>
+                  <h4 className="text-lg font-medium">{note.title}</h4>
+                  <p className="text-gray-700 mt-2">{note.description}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {new Date(note.createdAt).toLocaleString()}
                   </p>
-
                   <div className="flex gap-3 mt-3">
                     <button
                       onClick={() => startEdit(note)}
-                      className="px-3 py-1 bg-gray-800 hover:bg-black rounded-md text-white transition">
+                      className="px-3 py-1 bg-black text-white rounded-md">
                       Edit
                     </button>
 
                     <button
                       onClick={() => deleteNote(note._id)}
-                      className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-white transition">
+                      className="px-3 py-1 bg-red-600 text-white rounded-md">
                       Delete
                     </button>
-
                   </div>
                 </div>
               )}
