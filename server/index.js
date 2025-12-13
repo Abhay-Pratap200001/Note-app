@@ -4,16 +4,23 @@ import cookieParser from "cookie-parser"
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { connectDB } from "./config/db.connection.js";
+import authRouter from './Routes/user.Routes.js'
+import noteRouter from './Routes/note.Routes.js'
+
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-app.use(cookieParser())
+app.use(cookieParser()) //for accepting the cookies from client
+app.use(express.json()) //for input data
+
+// user and not routes
+app.use("/api/auth", authRouter)
+app.use("/api/note", noteRouter)
 
 app.use(errorHandler);
-
 
 // Connect DB and start server
 connectDB()
